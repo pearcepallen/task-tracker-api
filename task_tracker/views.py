@@ -12,6 +12,10 @@ def tasks(request):
     tasks = Task.objects.all()
     return JsonResponse([task.serialize() for task in tasks], safe=False)
 
+def task(request, task_id):
+    task = Task.objects.get(id=task_id)
+    return JsonResponse([task.serialize()], safe=False)
+
 @csrf_exempt
 def new_task(request):
     if request.method != "POST":
@@ -35,3 +39,12 @@ def reminder(request, task_id):
     task.reminder = data.get("reminder", "")
     task.save()
     return HttpResponse(status=204)
+
+@csrf_exempt
+def delete(request, task_id):
+    if request.method != "DELETE":
+        return JsonResponse({"error": "DELETE request required"}, status=400)
+
+    task = Task.objects.get(id=task_id)
+    task.delete()
+    return HttpResponse(status=200)
